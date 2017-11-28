@@ -8,6 +8,7 @@ import game_funcations as gf
 from pygame.sprite import Group
 from alien import Alien
 from alien_state import AlienState
+from game_stats import GameStats
 
 
 def run_game():
@@ -19,6 +20,8 @@ def run_game():
     alien_state = AlienState()
     screen = pygame.display.set_mode((ai_settings.screen_width, ai_settings.screen_height))
     pygame.display.set_caption("外星人入侵")
+
+    game_stats = GameStats(ai_settings, ship_state, bullet_state, alien_state)
 
     # 创建一艘飞船
     ship = Ship(screen, ship_state)
@@ -33,14 +36,17 @@ def run_game():
     while True:
         # 监视加键盘鼠标
         gf.check_events(ship, screen, bullets, bullet_state)
-        # 实时绘制飞船
-        ship.upLocationData()
 
-        # 更新子弹状态
-        gf.update_bullets(bullets, aliens)
+        if game_stats.alive:
 
-        # 更新外星人状态
-        gf.update_aliens(aliens, alien_state)
+            # 实时绘制飞船
+            ship.upLocationData()
+
+            # 更新子弹状态
+            gf.update_bullets(bullets, aliens, ai_settings, screen, alien_state, ship)
+
+            # 更新外星人状态
+            gf.update_aliens(aliens, bullets, game_stats, screen, ship)
 
         # 更新屏幕显示
         gf.updata_screen(ai_settings, screen, ship, bullets, aliens)
